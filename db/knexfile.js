@@ -29,7 +29,7 @@ const conf = {
       max: 10
     },
     migrations: {
-      tableName: 'knex_migrations_lda'
+      tableName: 'knex_migrations'
     }
   }
 };

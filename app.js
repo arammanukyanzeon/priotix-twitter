@@ -7,7 +7,7 @@ class Server {
     }
 
     initJobs() {
-        scheduleJob('*/15 * * * * ', () => {
+        scheduleJob('* * * * * ', () => {
             getTwitts();
         })
         getTwitts();
