@@ -20,11 +20,11 @@ module.exports = {
   production: {
     client: 'postgres',
     connection: {
-      database: 'priotix',
+      database: 'px_twitter',
       user: 'postgres',
       port: 5432,
       password: 'qwerty1',
-      host: 'priotix'
+      host: 'db'
     },
     pool: {
       min: 2,

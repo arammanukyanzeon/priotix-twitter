@@ -1,8 +1,13 @@
 import Twitter from 'twitter';
 import _ from 'lodash';
-import { getTopicToScrap, updateTopicUpdateDate } from "../../topics/model/topics.js";
 import moment from 'moment';
-import { updateRequestCount, addTweets, getLastTweetByTopic,  getAllTwiterClients, getFinishDates, getFirstTweetByTopic, addFinishDate } from '../model/twitter_client.model.js'
+
+import {
+    Topic,
+    Tweet,
+    TwitterClient,
+    FinishDates,
+} from '../models/index.js';
 
 const getAvailableDates = () => {
     const days = [];
@@ -36,7 +41,7 @@ const getTweetsForTopic = (client, topicName, sinceID, maxID, until) => {
             count: 100
         }, (err, twitterData) => {
             if (twitterData) {
-                updateRequestCount(twitterClint.options.id, 1);
+                TwitterClient.updateRequestCount(twitterClint.options.id, 1);
                 resolve(twitterData.statuses);
             }
         });
@@ -50,33 +55,33 @@ const insertTweets = (tweets, topicID) => {
         data.twitter_id = tweet.id_str;
         data.lang = tweet.lang;
         data.text = tweet.text;
-        addTweets(data, topicID);
+        Tweet.add(data, topicID);
     });
-    updateTopicUpdateDate(topicID, moment().utc().format());
+    Topic.updateUpdateDate(topicID, moment().utc().format());
 };
 
 export async function getTwitts() {
-    const [clients, topic] = await Promise.all([getAllTwiterClients(), getTopicToScrap()]);
+    const [clients, topic] = await Promise.all([TwitterClient.getAll(), Topic.getToScrap()]);
     
     if (clients.length === 0) return;
     const minReqCount = Math.min(...clients.map(c => c.requests_count));
     const client = clients.find(c => c.requests_count === minReqCount);
 
     // Get tweets from last 7 days
-    const finishDates = await getFinishDates(topic.id);
+    const finishDates = await FinishDates.get(topic.id);
     const availableDates = getAvailableDates();
     const dates = _.difference(availableDates, finishDates);
     for (let date of dates) {
-        const tweet = await getFirstTweetByTopic(topic.id, date);
+        const tweet = await Tweet.getFirstByTopic(topic.id, date);
         const maxID = tweet ? tweet.twitter_id : null;
         const tweets = await getTweetsForTopic(client, topic.name, null, maxID, date);
-        if (tweets.length < 100) addFinishDate({finish_date: date, topic_id: topic.id});
+        if (tweets.length < 100) FinishDates.add({finish_date: date, topic_id: topic.id});
         console.log(topic.name, date, tweets.length);
         insertTweets(tweets, topic.id);
     }
 
     // Get fresh tweets
-    const tweet = await getLastTweetByTopic(topic.id);
+    const tweet = await Tweet.getLastByTopic(topic.id);
     const sinceID = tweet ? tweet.twitter_id : null;
     const tweets = await getTweetsForTopic(client, topic.name, sinceID, null, null);
     insertTweets(tweets, topic.id);
