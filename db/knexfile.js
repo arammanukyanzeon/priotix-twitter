@@ -1,6 +1,6 @@
 // Update with your config settings.
 
-const conf = {
+module.exports = {
   development: {
     client: 'postgres',
     connection: {
@@ -33,4 +33,3 @@ const conf = {
     }
   }
 };
-export default conf;
