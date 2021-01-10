@@ -5,4 +5,5 @@ RUN npm install
 COPY . .
 ARG NODE_ENV
 ENV NODE_ENV=${DOCKER_ENV}
-CMD [ "npm", "start", "migrate_start" ]
+RUN knex migrate:latest
+CMD [ "npm", "start" ]
