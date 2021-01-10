@@ -14,7 +14,7 @@
   },
   "scripts": {
     "start": "node app",
-    "migrate": "cd db && knex migrate:latest && cd ..",
+    "migrate": "cd  db && knex migrate:latest --knexfile knexfile.cjs && cd ..",
     "migrate_start": "npm run migrate && npm start"
   },
   "author": "",
