@@ -1,11 +1,12 @@
 // Update with your config settings.
 
-module.exports = {
+const conf = {
   development: {
     client: 'postgres',
     connection: {
       database: 'priotix',
       user: 'postgres',
+      port: 5433,
       password: 'qwerty1'
     },
     pool: {
@@ -21,6 +22,7 @@ module.exports = {
     connection: {
       database: 'priotix',
       user: 'postgres',
+      port: 5433,
       password: 'qwerty1',
       host: 'priotix'
     },
@@ -33,3 +35,5 @@ module.exports = {
     }
   }
 };
+
+export default conf;
