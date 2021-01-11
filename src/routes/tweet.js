@@ -3,10 +3,9 @@ import { Topic, Tweet } from '../models/index.js';
 
 const router = express.Router();
 
-router.get('/:ids', async (req, res) => {
+router.get('/:id/:lastId', async (req, res) => {
     try {
-        const ids = req.params.ids;
-        const tweets = await Tweet.getByTopics(ids.split(','));
+        const tweets = await Tweet.getByTopicAndLastId(req.params.id, req.params.lastId);
 
         if (tweets) {
             res.status(200).json(tweets)

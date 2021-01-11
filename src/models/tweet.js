@@ -1,5 +1,6 @@
 import knex from "../../db/db.js";
 import moment from "moment";
+import _ from 'lodash';
 
 const tableName = 'tweets';
 
@@ -16,9 +17,23 @@ const model = {
             .returning("*");
     },
 
-    async getByTopics(ids) {
-        return await knex(tableName)
-            .whereIn('topic_id', ids)
+    async getByTopicAndLastId(id, lastID = 0) {
+        const createdDates = await knex(tableName)
+            .select(knex.raw('date(created_at) as created_at'))
+            .where('topic_id', id)
+            .where('id', '>', lastID)
+            .groupByRaw("date(created_at)");
+
+        const dates = _.groupBy(createdDates, (tweet) => moment(tweet.created_at).format("YYYY-MM-DD"));
+        const days = Object.keys(dates);
+
+        return knex.raw(`
+            SELECT *
+            FROM tweets 
+            WHERE date(created_at) in ('${days.join("', '")}')
+            ORDER BY id DESC
+            LIMIT 10000
+        `);
     },
 
     async getFirstByTopic(topicID, date) {

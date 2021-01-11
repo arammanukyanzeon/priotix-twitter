@@ -2,7 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import { scheduleJob } from 'node-schedule';
 import dotenv from 'dotenv';
-import { getTwitts } from './src/services/scraper.js';
+import Scraper from './src/services/scraper.js';
 
 import topicRoutes from './src/routes/topic.js';
 import tweetRoutes from './src/routes/tweet.js';
@@ -20,7 +20,7 @@ class Server {
 
     initJobs() {
         scheduleJob('* * * * *', () => {
-            getTwitts();
+            Scraper.start();
         });
     }
 
