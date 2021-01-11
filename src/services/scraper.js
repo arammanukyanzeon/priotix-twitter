@@ -45,6 +45,7 @@ const scraper = {
             const tweet = await Tweet.getFirstByTopic(topic.id, date);
             const maxID = tweet ? tweet.twitter_id : null;
             const [tweets, blocked] = await this.getTweetsForTopic(client, topic.name, null, maxID, date);
+            if (!tweets) continue;
             if (tweets.length === 0) {
                 FinishDates.add({ finish_date: date, topic_id: topic.id });
             } else {
@@ -60,7 +61,7 @@ const scraper = {
     async getFreshTweets(client, topic) {
         const tweet = await Tweet.getLastByTopic(topic.id);
         const sinceID = tweet ? tweet.twitter_id : null;
-        const [tweets, bloa] = await this.getTweetsForTopic(client, topic.name, sinceID, null, null);
+        const [tweets = [], bloa] = await this.getTweetsForTopic(client, topic.name, sinceID, null, null);
 
         tweets.forEach(t => Tweet.add(parseTweet(t), topic.id));
         Topic.updateUpdateDate(topic.id, moment().utc().format());
@@ -85,7 +86,7 @@ const scraper = {
                 q: topicName,
                 count: 100
             }, (err, twitterData, response) => {
-                const blocked = false;
+                let blocked = false;
                 if (err) console.log(err);
                 if (response && response.headers && response.headers["x-rate-limit-remaining"] === '0') {
                     const utcDate = response.headers["x-rate-limit-reset"];
@@ -96,7 +97,9 @@ const scraper = {
                 if (twitterData) {
                     TwitterClient.updateRequestCount(client.id, 1);
                     resolve([twitterData.statuses, blocked]);
-                    console.log(`${twitterData.statuses.length} tweets scraped for topic '${topicName}' ${until ? 'until ' + until : ''}`);
+                    if (twitterData.statuses) {
+                        console.log(`${twitterData.statuses.length} tweets scraped for topic '${topicName}' ${until ? 'until ' + until : ''}`);
+                    }
                 }
             });
         });
