@@ -24,14 +24,14 @@ const scraper = {
         }
 
         const client = getClientForScraping(clients);
-        if(!client) {
+        if (!client) {
             console.log("No available client");
             return;
         }
-    
+
         // Geting tweets for old dates
         const success = await this.getForOldDates(client, topic);
-    
+
         // Geting fresh tweets
         if (success) await this.getFreshTweets(client, topic);
     },
@@ -46,12 +46,12 @@ const scraper = {
             const maxID = tweet ? tweet.twitter_id : null;
             const [tweets, blocked] = await this.getTweetsForTopic(client, topic.name, null, maxID, date);
             if (tweets.length === 0) {
-                FinishDates.add({finish_date: date, topic_id: topic.id});
+                FinishDates.add({ finish_date: date, topic_id: topic.id });
             } else {
                 tweets.forEach(t => Tweet.add(parseTweet(t), topic.id));
                 Topic.updateUpdateDate(topic.id, moment().utc().format());
             }
-            if (blocked) return false; 
+            if (blocked) return false;
         }
 
         return true;
@@ -67,7 +67,7 @@ const scraper = {
     },
 
     getTweetsForTopic(client, topicName, sinceID, maxID, until) {
-        return new Promise ((resolve) => {
+        return new Promise((resolve) => {
             const twitterClient = new Twitter({
                 id: client.id,
                 consumer_key: client.api_key,
@@ -87,7 +87,7 @@ const scraper = {
             }, (err, twitterData, response) => {
                 const blocked = false;
                 if (err) console.log(err);
-                if (response.headers && response.headers["x-rate-limit-remaining"] === '0') {
+                if (response && response.headers && response.headers["x-rate-limit-remaining"] === '0') {
                     const utcDate = response.headers["x-rate-limit-reset"];
                     const localDate = moment(utcDate * 1000).format();
                     TwitterClient.blockUserUntil(client.id, localDate);
