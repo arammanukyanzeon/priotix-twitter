@@ -1,4 +1,5 @@
 import knex from "../../db/db.js";
+import moment from 'moment';
 
 const tableName = 'twitter_client';
 
@@ -9,10 +10,10 @@ const model = {
             .insert({
                 api_key: data.consumer_key,
                 api_key_secret: data.consumer_secret,
-                access_token_key: data.access_token_key,
+                acces_token: data.access_token,
                 acces_token_secret: data.access_token_secret,
-                expire_date: data.expire_date,
-                limit: data.limit,
+                expire_date: data.expire_date || moment().add(1, 'months'),
+                limit: data.limit || 500000,
             })
             .returning("*");
     },
