@@ -26,8 +26,8 @@ const model = {
 
         const dates = _.groupBy(createdDates, (tweet) => moment(tweet.created_at).format("YYYY-MM-DD"));
         const days = Object.keys(dates);
-
-        const {rows} = await knex.raw(`
+        if (!days.length) return [];
+        const { rows } = await knex.raw(`
             SELECT *
             FROM tweets 
             WHERE date(created_at) in ('${days.join("', '")}')
