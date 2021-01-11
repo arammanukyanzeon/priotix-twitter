@@ -1,37 +1,20 @@
-// Update with your config settings.
+var path = require('path');
+require('dotenv').config({path: path.resolve(__dirname, '../.env')});
 
 module.exports = {
-  development: {
-    client: 'postgres',
-    connection: {
-      database: 'priotix',
-      user: 'postgres',
-      port: 5432,
-      password: 'qwerty1'
-    },
-    pool: {
-      min: 2,
-      max: 10
-    },
-    migrations: {
-      tableName: 'knex_migrations'
-    }
+  client: 'postgres',
+  connection: {
+    database: process.env.DB_DATABASE,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    port: process.env.DB_PORT,
+    host: process.env.DB_HOST,
   },
-  production: {
-    client: 'postgres',
-    connection: {
-      database: 'px_twitter',
-      user: 'postgres',
-      port: 5432,
-      password: 'qwerty1',
-      host: 'db'
-    },
-    pool: {
-      min: 2,
-      max: 10
-    },
-    migrations: {
-      tableName: 'knex_migrations'
-    }
+  pool: {
+    min: 2,
+    max: 10
+  },
+  migrations: {
+    tableName: 'knex_migrations'
   }
 };

@@ -40,6 +40,7 @@ const getTweetsForTopic = (client, topicName, sinceID, maxID, until) => {
             q: topicName,
             count: 100
         }, (err, twitterData) => {
+            if (err) console.log(err);
             if (twitterData) {
                 TwitterClient.updateRequestCount(twitterClint.options.id, 1);
                 resolve(twitterData.statuses);
@@ -66,6 +67,10 @@ export async function getTwitts() {
     if (clients.length === 0) return;
     const minReqCount = Math.min(...clients.map(c => c.requests_count));
     const client = clients.find(c => c.requests_count === minReqCount);
+    if(!client) {
+        console.log("Clients does not exist");
+        return;
+    }
 
     // Get tweets from last 7 days
     const finishDates = await FinishDates.get(topic.id);
@@ -75,9 +80,11 @@ export async function getTwitts() {
         const tweet = await Tweet.getFirstByTopic(topic.id, date);
         const maxID = tweet ? tweet.twitter_id : null;
         const tweets = await getTweetsForTopic(client, topic.name, null, maxID, date);
-        if (tweets.length < 100) FinishDates.add({finish_date: date, topic_id: topic.id});
-        console.log(topic.name, date, tweets.length);
-        insertTweets(tweets, topic.id);
+        if (tweets.length === 0) {
+            FinishDates.add({finish_date: date, topic_id: topic.id});
+        } else {
+            insertTweets(tweets, topic.id);
+        }
     }
 
     // Get fresh tweets

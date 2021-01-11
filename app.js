@@ -1,13 +1,15 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import { scheduleJob } from 'node-schedule';
+import dotenv from 'dotenv';
 import { getTwitts } from './src/services/scraper.js';
 
 import topicRoutes from './src/routes/topic.js';
 import tweetRoutes from './src/routes/tweet.js';
 import twitterClientRoutes from './src/routes/twitter_client.js';
 
-const port = 8080;
+dotenv.config();
+const port = process.env.PORT;
 
 class Server {
     constructor() {
