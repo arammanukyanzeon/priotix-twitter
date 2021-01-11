@@ -6,7 +6,6 @@ const router = express.Router();
 router.get('/:id/:lastId', async (req, res) => {
     try {
         const tweets = await Tweet.getByTopicAndLastId(req.params.id, req.params.lastId);
-
         if (tweets) {
             res.status(200).json(tweets)
         } else {

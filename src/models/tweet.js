@@ -27,13 +27,14 @@ const model = {
         const dates = _.groupBy(createdDates, (tweet) => moment(tweet.created_at).format("YYYY-MM-DD"));
         const days = Object.keys(dates);
 
-        return knex.raw(`
+        const {rows} = await knex.raw(`
             SELECT *
             FROM tweets 
             WHERE date(created_at) in ('${days.join("', '")}')
             ORDER BY id DESC
-            LIMIT 10000
+            LIMIT 1000
         `);
+        return rows;
     },
 
     async getFirstByTopic(topicID, date) {

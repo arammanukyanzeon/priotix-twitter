@@ -97,6 +97,7 @@ const scraper = {
                     TwitterClient.updateRequestCount(client.id, 1);
                     resolve([twitterData.statuses, blocked]);
                 }
+                console.log(`${twitterData.statuses.length} tweets scraped for topic '${topicName}' ${until ? 'until ' + until : ''}`);
             });
         });
     }
